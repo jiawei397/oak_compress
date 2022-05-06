@@ -54,7 +54,9 @@ export function BR(options?: boolean | BRFunc | BROptions) {
     await next();
 
     const brCallback = typeof options === "function" ? options : undefined;
-    const body = ctx.response.body;
+    const body = (ctx.response.body && typeof ctx.response.body === "object")
+      ? JSON.stringify(ctx.response.body)
+      : ctx.response.body;
     if (brCallback) {
       if (!await brCallback(ctx)) {
         // console.debug(`callback not pass`);

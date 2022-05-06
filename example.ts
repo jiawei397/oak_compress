@@ -8,7 +8,10 @@ app.use(BR());
 
 app.use((ctx) => {
   const str = new Array(100000).fill("Hello World").join("\n");
-  ctx.response.body = str;
+  ctx.response.body = {
+    name: "test",
+    str,
+  };
 });
 
 console.log("app started with: http://localhost");
