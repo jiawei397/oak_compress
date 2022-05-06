@@ -38,17 +38,17 @@ export function BR(options?: boolean | BRFunc | BROptions) {
     }
     const encodings = ctx.request.headers.get("Accept-Encoding");
     if (!encodings) {
-      console.debug("no encoding");
+      // console.debug("no encoding");
       return next();
     }
     const tempArr = encodings.split(", ");
     if (!tempArr.includes("br")) {
-      console.debug("no br encoding");
+      // console.debug("no br encoding");
       return next();
     }
     const methods = finalOptions.methods!;
     if (!methods.includes(ctx.request.method)) {
-      console.debug(`method ${ctx.request.method} is not allowed`);
+      // console.debug(`method ${ctx.request.method} is not allowed`);
       return next();
     }
     await next();
@@ -57,18 +57,18 @@ export function BR(options?: boolean | BRFunc | BROptions) {
     const body = ctx.response.body;
     if (brCallback) {
       if (!await brCallback(ctx)) {
-        console.debug(`callback not pass`);
+        // console.debug(`callback not pass`);
         return;
       }
     } else {
       if (!body) {
-        console.debug(`response body is empty`);
+        // console.debug(`response body is empty`);
         return;
       }
       const minSize = finalOptions.minSize!;
       const maxSize = finalOptions.maxSize;
       if (body.length < minSize || (maxSize && body.length > maxSize)) {
-        console.debug(`response body size ${body.length} is not allowed`);
+        // console.debug(`response body size ${body.length} is not allowed`);
         return;
       }
     }
