@@ -2,6 +2,8 @@
 
 export type BRMethods = "GET" | "POST" | "PUT" | "DELETE";
 
+export type BRFunc = (ctx: Context) => boolean | Promise<boolean>;
+
 /**
  * Interface describing BR options that can be set.
  * @publicApi

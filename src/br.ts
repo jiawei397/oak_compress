@@ -1,6 +1,6 @@
 // Copyright 2021 the oak authors. All rights reserved. MIT license.
 import { compress } from "../deps.ts";
-import { BROptions, Context, Middleware } from "./types.ts";
+import { BRFunc, BROptions, Context, Middleware } from "./types.ts";
 
 /** A middleware that will deal with cors headers.
  *
@@ -16,14 +16,16 @@ import { BROptions, Context, Middleware } from "./types.ts";
  * await app.listen(":80");
  * ```
  */
-export function BR(options?: boolean | BROptions) {
+export function BR(options?: boolean | BRFunc | BROptions) {
   const defaultOptions: BROptions = {
     methods: ["GET"],
     minSize: 1024 * 10, // 10KB
     maxSize: undefined,
   };
   const finalOptions = defaultOptions;
-  if (options && typeof options !== "boolean") {
+  if (
+    options && typeof options !== "boolean" && typeof options !== "function"
+  ) {
     Object.assign(finalOptions, options);
   }
 
@@ -51,16 +53,24 @@ export function BR(options?: boolean | BROptions) {
     }
     await next();
 
+    const brCallback = typeof options === "function" ? options : undefined;
     const body = ctx.response.body;
-    if (!body) {
-      console.debug(`response body is empty`);
-      return;
-    }
-    const minSize = finalOptions.minSize!;
-    const maxSize = finalOptions.maxSize;
-    if (body.length < minSize || (maxSize && body.length > maxSize)) {
-      console.debug(`response body size ${body.length} is not allowed`);
-      return;
+    if (brCallback) {
+      if (!await brCallback(ctx)) {
+        console.debug(`callback not pass`);
+        return;
+      }
+    } else {
+      if (!body) {
+        console.debug(`response body is empty`);
+        return;
+      }
+      const minSize = finalOptions.minSize!;
+      const maxSize = finalOptions.maxSize;
+      if (body.length < minSize || (maxSize && body.length > maxSize)) {
+        console.debug(`response body size ${body.length} is not allowed`);
+        return;
+      }
     }
     const u8 = new TextEncoder().encode(body);
     ctx.response.body = compress(u8);

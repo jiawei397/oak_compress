@@ -142,4 +142,28 @@ describe("br", () => {
       "br",
     );
   });
+
+  it("use function self", async () => {
+    await BR((context) => {
+      if (context.response.body.length > 100) {
+        return false;
+      }
+      return true;
+    })(mockContext, brNext);
+    assertEquals(
+      mockContext.response.headers.get("content-encoding"),
+      null,
+    );
+
+    await BR((context) => {
+      if (context.response.body.length > 2) {
+        return true;
+      }
+      return false;
+    })(mockContext, noBrNext);
+    assertEquals(
+      mockContext.response.headers.get("content-encoding"),
+      "br",
+    );
+  });
 });
