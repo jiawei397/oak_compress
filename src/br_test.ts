@@ -1,6 +1,6 @@
 import { Context } from "./types.ts";
 import { assertEquals, beforeEach, describe, it } from "../test_deps.ts";
-import { BR } from "./br.ts";
+import { brotli } from "./br.ts";
 
 describe("br", () => {
   let mockContext: Context,
@@ -46,13 +46,13 @@ describe("br", () => {
   });
 
   it("no params", async () => {
-    await BR()(mockContext, noBrNext);
+    await brotli()(mockContext, noBrNext);
     assertEquals(
       mockContext.response.headers.get("content-encoding"),
       null,
     );
 
-    await BR()(mockContext, brNext);
+    await brotli()(mockContext, brNext);
     console.log(mockContext.response.headers);
     assertEquals(
       mockContext.response.headers.get("content-encoding"),
@@ -61,13 +61,13 @@ describe("br", () => {
   });
 
   it("params is true", async () => {
-    await BR(true)(mockContext, noBrNext);
+    await brotli(true)(mockContext, noBrNext);
     assertEquals(
       mockContext.response.headers.get("content-encoding"),
       null,
     );
 
-    await BR(true)(mockContext, brNext);
+    await brotli(true)(mockContext, brNext);
     assertEquals(
       mockContext.response.headers.get("content-encoding"),
       "br",
@@ -75,13 +75,13 @@ describe("br", () => {
   });
 
   it("params is false", async () => {
-    await BR(false)(mockContext, noBrNext);
+    await brotli(false)(mockContext, noBrNext);
     assertEquals(
       mockContext.response.headers.get("content-encoding"),
       null,
     );
 
-    await BR(false)(mockContext, brNext);
+    await brotli(false)(mockContext, brNext);
     assertEquals(
       mockContext.response.headers.get("content-encoding"),
       null,
@@ -108,7 +108,7 @@ describe("br", () => {
       },
     } as unknown as Context;
 
-    await BR(true)(mockContext, brNext);
+    await brotli(true)(mockContext, brNext);
     assertEquals(
       mockContext.response.headers.get("content-encoding"),
       null,
@@ -116,7 +116,7 @@ describe("br", () => {
   });
 
   it("change default maxSize", async () => {
-    await BR({
+    await brotli({
       maxSize: brStr.length - 1,
     })(mockContext, brNext);
     assertEquals(
@@ -124,7 +124,7 @@ describe("br", () => {
       null,
     );
 
-    await BR({
+    await brotli({
       maxSize: brStr.length,
     })(mockContext, brNext);
     assertEquals(
@@ -134,7 +134,7 @@ describe("br", () => {
   });
 
   it("change default minSize", async () => {
-    await BR({
+    await brotli({
       minSize: 1,
     })(mockContext, noBrNext);
     assertEquals(
@@ -144,22 +144,26 @@ describe("br", () => {
   });
 
   it("use function self", async () => {
-    await BR((context) => {
-      if (context.response.body.length > 100) {
-        return false;
-      }
-      return true;
+    await brotli({
+      filter: (context) => {
+        if (context.response.body.length > 100) {
+          return false;
+        }
+        return true;
+      },
     })(mockContext, brNext);
     assertEquals(
       mockContext.response.headers.get("content-encoding"),
       null,
     );
 
-    await BR((context) => {
-      if (context.response.body.length > 2) {
-        return true;
-      }
-      return false;
+    await brotli({
+      filter: (context) => {
+        if (context.response.body.length > 2) {
+          return true;
+        }
+        return false;
+      },
     })(mockContext, noBrNext);
     assertEquals(
       mockContext.response.headers.get("content-encoding"),

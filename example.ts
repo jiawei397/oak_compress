@@ -1,8 +1,8 @@
-import { BR } from "./mod.ts";
+import { brotli } from "./mod.ts";
 import { Application } from "https://deno.land/x/oak@v10.5.0/mod.ts";
 
 const app = new Application();
-app.use(BR());
+app.use(brotli());
 
 // other middleware
 

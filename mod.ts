@@ -1,3 +1,10 @@
 export * from "./src/br.ts";
 
-export type { BRMethods, BROptions } from "./src/types.ts";
+export type {
+  CompressExtensions,
+  CompressFilter,
+  CompressImpl,
+  CompressMethods,
+  CompressOptions,
+  CompressType,
+} from "./src/types.ts";

@@ -1,18 +1,38 @@
 // deno-lint-ignore-file no-explicit-any
 
-export type BRMethods = "GET" | "POST" | "PUT" | "DELETE";
+/**
+ * Compress a byte array.
+ *
+ * ```typescript
+ * import { compress } from "https://deno.land/x/brotli/mod.ts";
+ * const text = new TextEncoder().encode("X".repeat(64));
+ * console.log(text.length);                   // 64 Bytes
+ * console.log(compress(text).length);         // 10 Bytes
+ * ```
+ *
+ * @param input Input data.
+ */
+export type CompressImpl = (input: Uint8Array) => Uint8Array;
 
-export type BRFunc = (ctx: Context) => boolean | Promise<boolean>;
+export type CompressMethods = "GET" | "POST" | "PUT" | "DELETE";
+
+export type CompressFilter = (
+  ctx: Context,
+  content: Uint8Array,
+) => boolean | Promise<boolean>;
+
+export type CompressType = "gzip" | "br" | "deflate";
 
 /**
- * Interface describing BR options that can be set.
+ * Interface describing compress options that can be set.
  * @publicApi
  */
-export interface BROptions {
+export interface CompressOptions {
+  filter?: CompressFilter;
   /**
    * Configures the methods will encode with br.
    */
-  methods?: BRMethods[];
+  methods?: CompressMethods[];
 
   /**
    * If content length is less than minSize (byte), then will not br.
@@ -20,10 +40,16 @@ export interface BROptions {
   minSize?: number;
 
   /**
-   * If content length is larget than maxSize (byte), then will not br.
+   * If content length is larger than maxSize (byte), then will not br.
    */
   maxSize?: number;
+
+  extensions?: CompressExtensions[];
+  threshold?: number;
+  level?: number;
 }
+
+export type CompressExtensions = ".js" | ".png" | ".css" | ".html" | ".wasm";
 
 export interface Context {
   request: Request;
