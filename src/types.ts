@@ -44,12 +44,8 @@ export interface CompressOptions {
    */
   maxSize?: number;
 
-  extensions?: CompressExtensions[];
-  threshold?: number;
-  level?: number;
+  extensions?: string[];
 }
-
-export type CompressExtensions = ".js" | ".png" | ".css" | ".html" | ".wasm";
 
 export interface Context {
   request: Request;

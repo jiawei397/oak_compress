@@ -1,7 +1,8 @@
 export * from "./src/br.ts";
 
+export * from "./src/gzip.ts";
+
 export type {
-  CompressExtensions,
   CompressFilter,
   CompressImpl,
   CompressMethods,

@@ -46,6 +46,18 @@ export function compress(
     }
     await next();
 
+    if (finalOptions.extensions) {
+      const pathname = ctx.request.url.pathname;
+      if (!finalOptions.extensions.every((ext) => pathname.endsWith(ext))) {
+        console.debug(
+          `pathname ${pathname} not ends with extensions ${
+            finalOptions.extensions.join(",")
+          }`,
+        );
+        return;
+      }
+    }
+
     const body = ctx.response.body;
     let u8: Uint8Array;
     if (!body) {
