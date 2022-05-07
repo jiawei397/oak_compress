@@ -1,6 +1,6 @@
 # oak_compress
 
-[![Deno](https://github.com/jiawei397/oak_cors/actions/workflows/deno.yml/badge.svg)](https://github.com/jiawei397/oak_compress/actions/workflows/deno.yml)
+[![Deno](https://github.com/jiawei397/oak_compress/actions/workflows/deno.yml/badge.svg)](https://github.com/jiawei397/oak_compress/actions/workflows/deno.yml)
 
 A simple and opinionated `deflate`、`brotli` and `gzip` compress middleware for
 Deno [oak](https://deno.land/x/oak).
@@ -8,7 +8,11 @@ Deno [oak](https://deno.land/x/oak).
 ## Example
 
 ```typescript
-import { brotli, deflate, gzip } from "./mod.ts";
+import {
+  brotli,
+  deflate,
+  gzip,
+} from "https://deno.land/x/oak_compress@v0.0.1/mod.ts";
 import { Application } from "https://deno.land/x/oak@v10.5.0/mod.ts";
 
 const app = new Application();
