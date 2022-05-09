@@ -12,7 +12,7 @@ import {
   brotli,
   deflate,
   gzip,
-} from "https://deno.land/x/oak_compress@v0.0.1/mod.ts";
+} from "https://deno.land/x/oak_compress@v0.0.2/mod.ts";
 import { Application } from "https://deno.land/x/oak@v10.5.0/mod.ts";
 
 const app = new Application();
