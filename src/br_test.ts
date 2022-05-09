@@ -143,6 +143,55 @@ describe("br", () => {
     );
   });
 
+  it("set status", async () => {
+    const getStatusMock = (status: number) => {
+      return () => {
+        return new Promise<void>((resolve) => {
+          setTimeout(() => {
+            mockContext.response.body = brStr;
+            mockContext.response.status = status;
+            resolve();
+          }, 0);
+        });
+      };
+    };
+    await brotli(true)(mockContext, getStatusMock(100));
+    assertEquals(
+      mockContext.response.headers.get("content-encoding"),
+      null,
+    );
+
+    await brotli(true)(mockContext, getStatusMock(300));
+    assertEquals(
+      mockContext.response.headers.get("content-encoding"),
+      null,
+    );
+
+    await brotli(true)(mockContext, getStatusMock(302));
+    assertEquals(
+      mockContext.response.headers.get("content-encoding"),
+      null,
+    );
+
+    await brotli(true)(mockContext, getStatusMock(400));
+    assertEquals(
+      mockContext.response.headers.get("content-encoding"),
+      null,
+    );
+
+    await brotli(true)(mockContext, getStatusMock(500));
+    assertEquals(
+      mockContext.response.headers.get("content-encoding"),
+      null,
+    );
+
+    await brotli(true)(mockContext, getStatusMock(200));
+    assertEquals(
+      mockContext.response.headers.get("content-encoding"),
+      "br",
+    );
+  });
+
   it("use function self", async () => {
     await brotli({
       filter: (context) => {

@@ -22,6 +22,23 @@ export function compress(
     Object.assign(finalOptions, options);
   }
 
+  const getU8 = (body: unknown) => {
+    if (!body) {
+      return;
+    }
+    let u8: Uint8Array | undefined;
+    if (typeof body === "object") {
+      if (body instanceof Uint8Array) {
+        u8 = body;
+      } else {
+        u8 = new TextEncoder().encode(JSON.stringify(body));
+      }
+    } else if (typeof body === "string") {
+      u8 = new TextEncoder().encode(body);
+    }
+    return u8;
+  };
+
   const middleware: Middleware = async function (
     ctx: Context,
     next: () => Promise<unknown>,
@@ -30,6 +47,7 @@ export function compress(
     if (options === false) { // not need compress
       return;
     }
+
     const encodingStr = ctx.request.headers.get("Accept-Encoding");
     if (!encodingStr) {
       // console.debug("no encoding");
@@ -59,32 +77,34 @@ export function compress(
     }
 
     const body = ctx.response.body;
-    let u8: Uint8Array;
+
     if (!body) {
       // console.debug(`response body is empty`);
       return;
     }
-    if (typeof body === "object") {
-      if (body instanceof Uint8Array) {
-        u8 = body;
-      } else {
-        u8 = new TextEncoder().encode(JSON.stringify(body));
-      }
-    } else if (typeof body === "string") {
-      u8 = new TextEncoder().encode(body);
-    } else {
-      console.debug("response body is simple type and not will compress");
-      return;
-    }
 
+    let u8: Uint8Array | undefined;
     if (finalOptions.filter) {
+      u8 = getU8(body);
+      if (!u8) {
+        return;
+      }
       if (!await finalOptions.filter(ctx, u8)) {
         // console.debug(`filter not pass`);
         return;
       }
     } else {
+      const status = ctx.response.status;
+      if (status && (status < 200 || status >= 300)) {
+        // console.debug("status not sucessful");
+        return;
+      }
       const minSize = finalOptions.minSize!;
       const maxSize = finalOptions.maxSize;
+      u8 = getU8(body);
+      if (!u8) {
+        return;
+      }
       const len = u8.byteLength;
       if (len < minSize || (maxSize && len > maxSize)) {
         // console.debug(`response body size ${len} is not allowed`);
