@@ -26,25 +26,25 @@ export function compress(
     ctx: Context,
     next: () => Promise<unknown>,
   ) {
-    if (options === false) { // not need br
-      return next();
+    await next();
+    if (options === false) { // not need compress
+      return;
     }
-    const encodings = ctx.request.headers.get("Accept-Encoding");
-    if (!encodings) {
+    const encodingStr = ctx.request.headers.get("Accept-Encoding");
+    if (!encodingStr) {
       // console.debug("no encoding");
-      return next();
+      return;
     }
-    const tempArr = encodings.split(", ");
-    if (!tempArr.includes(type)) {
+    const encodings = encodingStr.split(", ");
+    if (!encodings.includes(type)) {
       // console.debug(`no ${finalOptions.type} encoding`);
-      return next();
+      return;
     }
     const methods = finalOptions.methods!;
     if (!methods.includes(ctx.request.method)) {
       // console.debug(`method ${ctx.request.method} is not allowed`);
-      return next();
+      return;
     }
-    await next();
 
     if (finalOptions.extensions) {
       const pathname = ctx.request.url.pathname;
